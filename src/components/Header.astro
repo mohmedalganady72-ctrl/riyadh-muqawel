@@ -1,0 +1,28 @@
+---
+import { UI, NAV, META } from '../data/site.js';
+import { href } from '../lib/views.js';
+import { LOGO } from '../data/logo.js';
+const { lang, id } = Astro.props;
+const t = (o: any) => o[lang], u = (k: string) => UI[k][lang], other = lang === 'ar' ? 'en' : 'ar';
+const cur = (x: string) => (x === id ? { 'aria-current': 'page', class: 'on' } : id.startsWith(x + '/') ? { class: 'on' } : {});
+const m = META[lang].name.split(' ');
+---
+<a class="skip" href="#main">{u('skip')}</a>
+<header class="hd"><div class="wrap hdin">
+  <a class="logo" href={href(lang)} aria-label={u('homeAria')}><svg viewBox={`0 0 ${LOGO[lang].w} ${LOGO[lang].h}`} width={Math.round(LOGO[lang].w * 42 / LOGO[lang].h)} height="42" aria-hidden="true" focusable="false"><use href="#lg"></use></svg></a>
+  <nav id="nav" aria-label={u('primary')}><ul id="menu">
+    {NAV.map((n, i) => n.k ? (
+      <li class="has" style={`--i:${i}`}><button type="button" aria-haspopup="true" aria-expanded="false">{t(n.t)}</button>
+        <div class="dd">{n.k.map((k, j) => <a href={href(lang, k[0])} style={`--i:${j}`} {...cur(k[0])}><b>{t(k[1])}</b><small>{t(k[2])}</small></a>)}</div></li>
+    ) : <li style={`--i:${i}`}><a href={href(lang, n.id)} {...cur(n.id)}>{t(n.t)}</a></li>)}
+  </ul></nav>
+  <div class="hr">
+    <a class="lg" href={href(other, id === '404' ? 'home' : id)} hreflang={other} lang={other} aria-label={u('langAria')}>{META[other].label}</a>
+    <button class="tb" id="theme" type="button" aria-pressed="false" aria-label={u('theme')}>
+      <svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></svg>
+      <svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg>
+    </button>
+    <a class="btn sm" href={href(lang, 'contact')}>{u('contact')}</a>
+  </div>
+  <button class="bg" id="bg" type="button" aria-label={u('menuOpen')} aria-expanded="false" aria-controls="nav" data-open={u('menuOpen')} data-close={u('menuClose')}><span></span></button>
+</div></header>

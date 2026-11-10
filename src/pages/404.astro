@@ -1,0 +1,28 @@
+---
+// 404: one file for the whole site (hosts serve /404.html). Both languages are in the page; a tiny script shows the one that matches the
+// address (/en/... → English, otherwise Arabic). Without JavaScript both are visible. Not indexed.
+import Layout from '../layouts/Layout.astro';
+import { UI } from '../data/site.js';
+import { href } from '../lib/views.js';
+const langs = ['ar', 'en'] as const;
+---
+<Layout lang="ar" id="404" title={`${UI.notFound.ar} · ${UI.notFound.en}`} description={UI.nfText.ar} noindex>
+  <section class="nf"><div class="wrap">
+    {langs.map((l) => (
+      <div class="nfb" data-nf={l} lang={l} dir={l === 'ar' ? 'rtl' : 'ltr'}>
+        <p class="nfc" aria-hidden="true"><bdi dir="ltr">404</bdi></p>
+        <h1>{UI.notFound[l]}</h1>
+        <p class="lead">{UI.nfText[l]}</p>
+        <div class="nfa"><a class="btn" href={href(l)}>{UI.nfHome[l]}</a><a class="lnk" href={href(l, 'projects')}>{UI.nfWork[l]} <span aria-hidden="true">{l === 'ar' ? '←' : '→'}</span></a></div>
+      </div>
+    ))}
+  </div></section>
+  <script is:inline>
+    (function () {
+      var en = /^\/en(\/|$)/.test(location.pathname) || (!/^\/ar(\/|$)/.test(location.pathname) && /^en/i.test(navigator.language || ''));
+      var keep = en ? 'en' : 'ar';
+      document.querySelectorAll('[data-nf]').forEach(function (n) { if (n.dataset.nf !== keep) n.hidden = true; });
+      if (en) document.title = 'Page not found \u00b7 Riyadh Contractor';
+    })();
+  </script>
+</Layout>

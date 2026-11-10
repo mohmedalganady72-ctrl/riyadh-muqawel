@@ -1,0 +1,14 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { LANGS, PAGES, HOMET, PJ_IDS, NAV } from '../../data/site.js';
+import { views, href } from '../../lib/views.js';
+export function getStaticPaths() {
+  return LANGS.flatMap((lang) => [{ params: { lang, slug: undefined } }, ...[...Object.keys(PAGES), ...PJ_IDS].map((slug) => ({ params: { lang, slug } }))]);
+}
+const { lang, slug } = Astro.params;
+const id = slug || 'home', v = views(lang as 'en' | 'ar');
+const r = id === 'home' ? { html: v.home(), title: HOMET.title[lang], desc: HOMET.desc[lang] } : v.page(id)!;
+// Breadcrumb data for project detail pages (JSON-LD): Home > Our work > project
+const crumbs = id.startsWith('projects/') ? [[NAV[2].t[lang], href(lang, 'projects')], [r.title, href(lang, id)]] : [];
+---
+<Layout lang={lang as 'en' | 'ar'} id={id} title={r.title} description={r.desc} crumbs={crumbs as [string, string][]}><Fragment set:html={r.html} /></Layout>
